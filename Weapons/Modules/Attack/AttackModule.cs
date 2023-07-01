@@ -8,8 +8,15 @@ public abstract partial class AttackModule : WeaponModule
 {
     [Net, Predicted, Local]
     public AmmoInventory WeaponClip { get; private set; }
+
+    [Net, Predicted, Local]
+    public TimeSince TimeSinceLastAttackTry { get; protected set; } = float.MaxValue;
+
     [Net, Predicted, Local]
     public TimeSince TimeSinceLastAttack { get; protected set; } = float.MaxValue;
+
+    [Net, Predicted, Local]
+    public TimeSince TimeSinceLastFail { get; protected set; } = float.MaxValue;
 
     [Net, Local]
     public float FireRate { get; set; } = 10f;
@@ -31,13 +38,19 @@ public abstract partial class AttackModule : WeaponModule
 
     public override SimulationResult Simulate()
     {
+        var result = SimulationResult.Finished;
         if(CanStartAttack())
         {
             Attack();
-            return SimulationResult.Continuing;
+            result = SimulationResult.Continuing;
+        }
+        else if(CanStartFail())
+        {
+            Fail();
         }
 
-        return SimulationResult.Finished;
+        TimeSinceLastAttackTry = 0;
+        return result;
     }
 
     public virtual bool CanStartAttack()
@@ -45,6 +58,10 @@ public abstract partial class AttackModule : WeaponModule
         return TimeSinceLastAttack >= MinTimeBetweenAttacks && WeaponClip.HasAmmo();
     }
 
+    protected virtual bool CanStartFail()
+    {
+        return TimeSinceLastAttackTry >= MinTimeBetweenAttacks;
+    }
 
     public virtual void Attack()
     {
@@ -59,6 +76,11 @@ public abstract partial class AttackModule : WeaponModule
             Shoot();
         }
         TimeSinceLastAttack = 0;
+    }
+
+    protected virtual void Fail()
+    {
+        TimeSinceLastFail = 0;
     }
 
     protected abstract void Shoot();

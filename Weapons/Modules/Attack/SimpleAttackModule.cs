@@ -33,9 +33,6 @@ public partial class SimpleAttackModule : AttackModule
 
 
     [Net, Predicted, Local]
-    public TimeSince TimeSinceFailedAttack { get; protected set; }
-
-    [Net, Predicted, Local]
     public ShootingMode ShootingMode { get; protected set; }
 
 
@@ -56,33 +53,22 @@ public partial class SimpleAttackModule : AttackModule
     public override SimulationResult Simulate()
     {
         if(ShouldAttack())
-        {
-            if(CanStartAttack())
-            {
-                Attack();
-                return SimulationResult.Continuing;
-            }
-            else
-            {
-                OnFailedAttack();
-                TimeSinceFailedAttack = 0;
-                return SimulationResult.Finished;
-            }
-        }
+            base.Simulate();
 
         return ShootingMode.IsShooting ? SimulationResult.Continuing : SimulationResult.Finished;
     }
 
-    public sealed override void Attack()
+    public override void Attack()
     {
         base.Attack();
         ShootingMode.OnShot();
     }
 
-    protected virtual void OnFailedAttack()
+    protected override void Fail()
     {
+        base.Fail();
         ShootingMode.OnFail();
-        DoDryifireEffects();
+        DoFailEffects();
     }
 
     protected override void OnDeactivate()
@@ -93,17 +79,12 @@ public partial class SimpleAttackModule : AttackModule
 
     protected virtual bool ShouldAttack()
     {
-        bool timePassed = TimeSinceLastAttack >= MinTimeBetweenAttacks && TimeSinceFailedAttack >= MinTimeBetweenAttacks;
+        bool timePassed = TimeSinceLastAttackTry >= MinTimeBetweenAttacks;
         if(timePassed == false)
             return false;
 
         bool hasOwner = Weapon.Owner.IsValid();
         return hasOwner ? ShootingMode.ShouldAttack(AttackAction) : ShootingMode.ShouldAttack();
-    }
-
-    public override bool CanStartAttack()
-    {
-        return TimeSinceFailedAttack >= MinTimeBetweenAttacks && base.CanStartAttack();
     }
 
     protected override void Shoot()
@@ -127,7 +108,7 @@ public partial class SimpleAttackModule : AttackModule
         Weapon.SetViewModelAnimParameter(AttackAnimation, true);
     }
 
-    protected virtual void DoDryifireEffects()
+    protected virtual void DoFailEffects()
     {
         if(Game.IsServer == false)
             return;
