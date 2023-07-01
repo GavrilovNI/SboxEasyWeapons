@@ -1,8 +1,7 @@
 ﻿using EasyWeapons.Bullets.Spawners;
+using EasyWeapons.Sounds;
 using EasyWeapons.Weapons.Modules.Attack.ShootingModes;
 using Sandbox;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EasyWeapons.Weapons.Modules.Attack;
 
@@ -16,11 +15,20 @@ public partial class SimpleAttackModule : AttackModule
     [Net, Local]
     public BulletSpawner BulletSpawner { get; protected set; }
 
+    [Net]
+    public PlayableDelayedSound? AttackSound { get; set; }
+
+    [Net]
+    public PlayableDelayedSound? DryfireSound { get; set; }
+
+
+
     [Net, Predicted, Local]
     public TimeSince TimeSinceFailedAttack { get; protected set; }
 
     [Net, Predicted, Local]
     public ShootingMode ShootingMode { get; protected set; }
+
 
     public SimpleAttackModule()
     {
@@ -105,9 +113,9 @@ public partial class SimpleAttackModule : AttackModule
         if(Game.IsServer == false)
             return;
 
-        /*_ = AttackSound?.PlayOnEntity(Weapon);
-        Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
-        Weapon.SetViewModelAnimParameter(AttackAnimation, true);*/
+        _ = AttackSound?.PlayOnEntity(Weapon);
+        //Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
+        //Weapon.SetViewModelAnimParameter(AttackAnimation, true);
     }
 
     protected virtual void DoDryifireEffects()
@@ -115,6 +123,6 @@ public partial class SimpleAttackModule : AttackModule
         if(Game.IsServer == false)
             return;
 
-        //_ = DryfireSound?.PlayOnEntity(Weapon);
+        _ = DryfireSound?.PlayOnEntity(Weapon);
     }
 }
