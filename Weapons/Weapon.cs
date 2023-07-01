@@ -8,6 +8,9 @@ namespace EasyWeapons.Weapons;
 public partial class Weapon : BaseCarriable
 {
     [Net, Local]
+    public string? DeployAnimationParameter { get; set; } = "b_deploy";
+
+    [Net, Local]
     public string? ViewMoidelArmsPath { get; set; } = "models/first_person/first_person_arms.vmdl";
 
     [Net, Local]
@@ -170,6 +173,9 @@ public partial class Weapon : BaseCarriable
     {
         if(Game.IsServer == false)
             return;
+
+        if(DeployAnimationParameter is not null)
+            SetViewModelAnimParameter(DeployAnimationParameter, true);
 
         //_ = DeploySound?.PlayOnEntity(this);
     }
