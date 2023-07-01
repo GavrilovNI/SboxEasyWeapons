@@ -8,7 +8,7 @@ public abstract partial class ShootingMode : BaseNetworkable
     [Net, Predicted, Local]
     public bool IsShooting { get; protected set; } = false;
 
-    public abstract bool ShouldAttack(InputButton inputButton);
+    public abstract bool ShouldAttack(string inputAction);
     public abstract bool ShouldAttack();
 
     public virtual void OnShot()

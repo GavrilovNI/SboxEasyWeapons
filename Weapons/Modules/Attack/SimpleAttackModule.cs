@@ -10,7 +10,7 @@ public partial class SimpleAttackModule : AttackModule
     public virtual Ray AimRay => Weapon.AimRay;
 
     [Net, Local]
-    public InputButton AttackButton { get; protected set; }
+    public string AttackAction { get; protected set; }
 
     [Net, Local]
     public BulletSpawner BulletSpawner { get; protected set; }
@@ -45,10 +45,10 @@ public partial class SimpleAttackModule : AttackModule
         ShootingMode = null!;
     }
 
-    public SimpleAttackModule(BulletSpawner bulletSpawner, ShootingMode shootingMode, InputButton attackButton = InputButton.PrimaryAttack)
+    public SimpleAttackModule(BulletSpawner bulletSpawner, ShootingMode shootingMode, string attackAction = "attack1")
     {
         BulletSpawner = bulletSpawner;
-        AttackButton = attackButton;
+        AttackAction = attackAction;
         ShootingMode = shootingMode;
     }
 
@@ -97,7 +97,7 @@ public partial class SimpleAttackModule : AttackModule
             return false;
 
         bool hasOwner = Weapon.Owner.IsValid();
-        return hasOwner ? ShootingMode.ShouldAttack(AttackButton) : ShootingMode.ShouldAttack();
+        return hasOwner ? ShootingMode.ShouldAttack(AttackAction) : ShootingMode.ShouldAttack();
     }
 
     public override bool CanStartAttack()

@@ -9,9 +9,9 @@ public class SemiShootingMode : ShootingMode
         return false;
     }
 
-    public override bool ShouldAttack(InputButton inputButton)
+    public override bool ShouldAttack(string inputAction)
     {
-        return Input.Pressed(inputButton);
+        return Input.Pressed(inputAction);
     }
 
     public override void OnShot()
