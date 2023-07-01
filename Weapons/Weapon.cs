@@ -167,6 +167,7 @@ public partial class Weapon : BaseCarriable
     {
         Game.AssertClient();
         ViewModelEntity?.SetAnimParameter(name, value);
+        ViewModelArms?.SetAnimParameter(name, value);
     }
 
     public virtual void DoDeployEffects()
