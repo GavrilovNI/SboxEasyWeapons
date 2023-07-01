@@ -1,4 +1,5 @@
 ﻿using EasyWeapons.Bullets.Spawners;
+using EasyWeapons.Inventories;
 using EasyWeapons.Sounds;
 using EasyWeapons.Weapons.Modules.Attack.ShootingModes;
 using Sandbox;
@@ -45,7 +46,7 @@ public partial class SimpleAttackModule : AttackModule
         ShootingMode = null!;
     }
 
-    public SimpleAttackModule(BulletSpawner bulletSpawner, ShootingMode shootingMode, string attackAction = "attack1")
+    public SimpleAttackModule(AmmoInventory weaponClip, BulletSpawner bulletSpawner, ShootingMode shootingMode, string attackAction = "attack1") : base(weaponClip)
     {
         BulletSpawner = bulletSpawner;
         AttackAction = attackAction;

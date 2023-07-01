@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using EasyWeapons.Inventories;
+using Sandbox;
 using System;
 
 namespace EasyWeapons.Weapons.Modules.Attack;
@@ -6,12 +7,26 @@ namespace EasyWeapons.Weapons.Modules.Attack;
 public abstract partial class AttackModule : WeaponModule
 {
     [Net, Predicted, Local]
-    public TimeSince TimeSinceLastAttack { get; protected set; }
+    public AmmoInventory WeaponClip { get; private set; }
+    [Net, Predicted, Local]
+    public TimeSince TimeSinceLastAttack { get; protected set; } = float.MaxValue;
 
     [Net, Local]
     public float FireRate { get; set; } = 10f;
 
     public float MinTimeBetweenAttacks => FireRate < 0.0001f ? float.MaxValue : 1f / FireRate;
+
+
+    public AttackModule()
+    {
+        Game.AssertClient();
+        WeaponClip = null!;
+    }
+
+    public AttackModule(AmmoInventory weaponClip)
+    {
+        WeaponClip = weaponClip;
+    }
 
 
     public override SimulationResult Simulate()
@@ -27,7 +42,7 @@ public abstract partial class AttackModule : WeaponModule
 
     public virtual bool CanStartAttack()
     {
-        return TimeSinceLastAttack >= MinTimeBetweenAttacks;
+        return TimeSinceLastAttack >= MinTimeBetweenAttacks && WeaponClip.HasAmmo();
     }
 
 
@@ -38,6 +53,7 @@ public abstract partial class AttackModule : WeaponModule
 
         Enabled = true;
 
+        WeaponClip.TakeExactAmmo(1);
         using(Sandbox.Entity.LagCompensation())
         {
             Shoot();
