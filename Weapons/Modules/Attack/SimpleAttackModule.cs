@@ -24,6 +24,12 @@ public partial class SimpleAttackModule : AttackModule
     [Net]
     public string AttackAnimation { get; set; } = "fire";
 
+    [Net]
+    public string AttackParticlePath { get; set; } = "particles/pistol_muzzleflash.vpcf";
+
+    [Net]
+    public string AttackParticleAttachment { get; set; } = "muzzle";
+
 
     [Net, Predicted, Local]
     public TimeSince TimeSinceFailedAttack { get; protected set; }
@@ -116,7 +122,7 @@ public partial class SimpleAttackModule : AttackModule
             return;
 
         _ = AttackSound?.PlayOnEntity(Weapon);
-        //Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
+        Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
         Weapon.SetViewModelAnimParameter(AttackAnimation, true);
     }
 
