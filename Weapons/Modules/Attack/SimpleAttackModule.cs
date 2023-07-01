@@ -21,6 +21,8 @@ public partial class SimpleAttackModule : AttackModule
     [Net]
     public PlayableDelayedSound? DryfireSound { get; set; }
 
+    [Net]
+    public string AttackAnimation { get; set; } = "fire";
 
 
     [Net, Predicted, Local]
@@ -115,7 +117,7 @@ public partial class SimpleAttackModule : AttackModule
 
         _ = AttackSound?.PlayOnEntity(Weapon);
         //Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
-        //Weapon.SetViewModelAnimParameter(AttackAnimation, true);
+        Weapon.SetViewModelAnimParameter(AttackAnimation, true);
     }
 
     protected virtual void DoDryifireEffects()
