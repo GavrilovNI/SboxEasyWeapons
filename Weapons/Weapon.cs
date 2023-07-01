@@ -1,4 +1,5 @@
-﻿using EasyWeapons.Weapons.Modules;
+﻿using EasyWeapons.Sounds;
+using EasyWeapons.Weapons.Modules;
 using Sandbox;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,10 @@ namespace EasyWeapons.Weapons;
 
 public partial class Weapon : BaseCarriable
 {
+
+    [Net]
+    public PlayableDelayedSound? DeploySound { get; set; }
+
     [Net, Local]
     public string? DeployAnimationParameter { get; set; } = "b_deploy";
 
@@ -178,6 +183,6 @@ public partial class Weapon : BaseCarriable
         if(DeployAnimationParameter is not null)
             SetViewModelAnimParameter(DeployAnimationParameter, true);
 
-        //_ = DeploySound?.PlayOnEntity(this);
+        _ = DeploySound?.PlayOnEntity(this);
     }
 }
