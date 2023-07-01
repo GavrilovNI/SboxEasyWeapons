@@ -141,11 +141,7 @@ public partial class Weapon : BaseCarriable
     public override void ActiveStart(Entity owner)
     {
         base.ActiveStart(owner);
-        if(Game.IsServer)
-        {
-            using(Prediction.Off())
-                TimeSinceDeploy = 0;
-        }
+        TimeSinceDeploy = 0;
         DoDeployEffects();
     }
 
