@@ -11,7 +11,7 @@ public partial class SimpleAttackModule : AttackModule
     public virtual Ray AimRay => Weapon.AimRay;
 
     [Net, Local]
-    public string AttackAction { get; protected set; }
+    public string AttackAction { get; protected set; } = "attack1";
 
     [Net, Local]
     public BulletSpawner BulletSpawner { get; protected set; }
