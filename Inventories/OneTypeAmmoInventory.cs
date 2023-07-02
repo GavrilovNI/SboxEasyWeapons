@@ -57,6 +57,9 @@ public partial class OneTypeAmmoInventory : AmmoInventory
 
     public override int GetCount() => AmmoCount;
 
+    public override int GetLimit(string ammoId) => AmmoId == ammoId ? MaxAmmoCount : 0;
+
+    public override int GetLimit() => MaxAmmoCount;
 
     public override List<OneTypeAmmoInventory> TakeSome(int maxCount)
     {
