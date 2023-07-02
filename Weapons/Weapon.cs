@@ -78,7 +78,7 @@ public partial class Weapon : BaseCarriable
     }
 
 
-    [Event.Tick.Server]
+    [GameEvent.Tick.Server]
     private void ServerTick()
     {
         if(Owner.IsValid() == false)
