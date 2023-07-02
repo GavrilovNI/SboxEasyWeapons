@@ -20,7 +20,7 @@ public partial class InfinityAmmoInventory : AmmoInventory
     }
 
     protected override void Set(string ammoId, int count) { }
-    public override int GetAmmoCount(string ammoId) => int.MaxValue;
-    public override int GetAmmoCount() => int.MaxValue;
-    public override List<OneTypeAmmoInventory> TakeSomeAmmo(int maxCount) => new() { OneTypeAmmoInventory.Full(AmmoId, maxCount) };
+    public override int GetCount(string ammoId) => int.MaxValue;
+    public override int GetCount() => int.MaxValue;
+    public override List<OneTypeAmmoInventory> TakeSome(int maxCount) => new() { OneTypeAmmoInventory.Full(AmmoId, maxCount) };
 }

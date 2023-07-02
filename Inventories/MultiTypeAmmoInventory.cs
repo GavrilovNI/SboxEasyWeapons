@@ -15,7 +15,7 @@ public partial class MultiTypeAmmoInventory : AmmoInventory
 
     protected override void Set(string ammoId, int count)
     {
-        var oldCount = GetAmmoCount(ammoId);
+        var oldCount = GetCount(ammoId);
         if(count == 0)
             Ammos.Remove(ammoId);
         else
@@ -23,32 +23,19 @@ public partial class MultiTypeAmmoInventory : AmmoInventory
         AmmoCount += count - oldCount;
     }
 
-    public override int GetMaxAmountCanAdd(string ammoId)
-    {
-        if(Ammos.TryGetValue(ammoId, out int currentAmount))
-            return int.MaxValue - currentAmount;
-
-        return int.MaxValue;
-    }
-
-    public override bool HasAmmo()
-    {
-        return Ammos.Keys.Count > 0;
-    }
-
-    public override int GetAmmoCount(string ammoId)
+    public override int GetCount(string ammoId)
     {
         if(Ammos.TryGetValue(ammoId, out int currentAmount))
             return currentAmount;
         return 0;
     }
 
-    public override int GetAmmoCount()
+    public override int GetCount()
     {
         return AmmoCount;
     }
 
-    public override List<OneTypeAmmoInventory> TakeSomeAmmo(int maxCount)
+    public override List<OneTypeAmmoInventory> TakeSome(int maxCount)
     {
         List<OneTypeAmmoInventory> result = new();
 

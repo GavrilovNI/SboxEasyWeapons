@@ -55,7 +55,7 @@ public abstract partial class AttackModule : WeaponModule
 
     public virtual bool CanStartAttack()
     {
-        return TimeSinceLastAttack >= MinTimeBetweenAttacks && WeaponClip.HasAmmo();
+        return TimeSinceLastAttack >= MinTimeBetweenAttacks && WeaponClip.ContainsAny();
     }
 
     protected virtual bool CanStartFail()
@@ -70,7 +70,7 @@ public abstract partial class AttackModule : WeaponModule
 
         Enabled = true;
 
-        WeaponClip.TakeExactAmmo(1);
+        WeaponClip.TakeExact(1);
         using(Sandbox.Entity.LagCompensation())
         {
             Shoot();

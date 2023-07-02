@@ -5,18 +5,16 @@ namespace EasyWeapons.Inventories;
 public interface IAmmoInventory
 {
     bool CanAdd(string ammoId, int count);
-    int GetMaxAmountCanAdd(string ammoId);
     void Add(string ammoId, int count);
 
-    bool HasAmmo();
-    bool HasAmmo(string ammoId);
+    int GetLimit(string ammoId);
+    int GetLimit();
+    int GetCount(string ammoId);
+    int GetCount();
 
-    int GetAmmoCount(string ammoId);
-    int GetAmmoCount();
+    OneTypeAmmoInventory TakeExact(string ammoId, int count);
+    OneTypeAmmoInventory TakeSome(string ammoId, int maxCount);
 
-    OneTypeAmmoInventory TakeExactAmmo(string ammoId, int count);
-    OneTypeAmmoInventory TakeSomeAmmo(string ammoId, int maxCount);
-
-    List<OneTypeAmmoInventory> TakeExactAmmo(int count);
-    List<OneTypeAmmoInventory> TakeSomeAmmo(int maxCount);
+    List<OneTypeAmmoInventory> TakeExact(int count);
+    List<OneTypeAmmoInventory> TakeSome(int maxCount);
 }

@@ -53,11 +53,12 @@ public partial class OneTypeAmmoInventory : AmmoInventory
             AmmoCount = count;
     }
 
-    public override int GetAmmoCount(string ammoId) => AmmoId == ammoId ? AmmoCount : 0;
+    public override int GetCount(string ammoId) => AmmoId == ammoId ? AmmoCount : 0;
 
-    public override int GetAmmoCount() => AmmoCount;
+    public override int GetCount() => AmmoCount;
 
-    public override List<OneTypeAmmoInventory> TakeSomeAmmo(int maxCount)
+
+    public override List<OneTypeAmmoInventory> TakeSome(int maxCount)
     {
         var countToTake = Math.Min(maxCount, AmmoCount);
         AmmoCount -= countToTake;

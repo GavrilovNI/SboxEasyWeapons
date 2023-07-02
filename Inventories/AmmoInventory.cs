@@ -8,20 +8,18 @@ namespace EasyWeapons.Inventories;
 public abstract class AmmoInventory : BaseNetworkable, IAmmoInventory
 {
     protected abstract void Set(string ammoId, int count);
-    public abstract int GetAmmoCount(string ammoId);
-    public abstract int GetAmmoCount();
+    public abstract int GetCount(string ammoId);
+    public abstract int GetCount();
 
-    public abstract List<OneTypeAmmoInventory> TakeSomeAmmo(int maxCount);
+    public abstract List<OneTypeAmmoInventory> TakeSome(int maxCount);
 
-
-    public virtual bool HasAmmo() => GetAmmoCount() > 0;
-
-    public virtual bool HasAmmo(string ammoId) => GetAmmoCount(ammoId) > 0;
+    public virtual int GetLimit(string ammoId) => int.MaxValue;
+    public virtual int GetLimit() => int.MaxValue;
 
 
     protected virtual void Subtract(string ammoId, int count)
     {
-        var oldCount = GetAmmoCount(ammoId);
+        var oldCount = GetCount(ammoId);
         Set(ammoId, oldCount - count);
     }
 
@@ -30,7 +28,7 @@ public abstract class AmmoInventory : BaseNetworkable, IAmmoInventory
         if(CanAdd(ammoId, count) == false)
             throw new InvalidOperationException($"Can't add. Test {nameof(CanAdd)} first.");
 
-        int currentAmount = GetAmmoCount(ammoId);
+        int currentAmount = GetCount(ammoId);
         Set(ammoId, currentAmount + count);
     }
 
@@ -39,37 +37,31 @@ public abstract class AmmoInventory : BaseNetworkable, IAmmoInventory
         if(count < 0)
             throw new ArgumentOutOfRangeException(nameof(count));
 
-        int currentAmount = GetAmmoCount(ammoId);
+        int currentAmount = GetCount(ammoId);
         return int.MaxValue - currentAmount > count;
     }
 
-    public virtual int GetMaxAmountCanAdd(string ammoId)
+    public virtual OneTypeAmmoInventory TakeExact(string ammoId, int count)
     {
-        int currentAmount = GetAmmoCount(ammoId);
-        return int.MaxValue - currentAmount;
-    }
-
-    public virtual OneTypeAmmoInventory TakeExactAmmo(string ammoId, int count)
-    {
-        int currentCount = GetAmmoCount(ammoId);
+        int currentCount = GetCount(ammoId);
         if(currentCount < count)
-            throw new InvalidOperationException($"Can't take. Check {nameof(GetAmmoCount)} first.");
+            throw new InvalidOperationException($"Can't take. Check {nameof(GetCount)} first.");
 
-        return TakeSomeAmmo(ammoId, count);
+        return TakeSome(ammoId, count);
     }
 
-    public virtual List<OneTypeAmmoInventory> TakeExactAmmo(int count)
+    public virtual List<OneTypeAmmoInventory> TakeExact(int count)
     {
-        int currentCount = GetAmmoCount();
+        int currentCount = GetCount();
         if(currentCount < count)
-            throw new InvalidOperationException($"Can't take. Check {nameof(GetAmmoCount)} first.");
+            throw new InvalidOperationException($"Can't take. Check {nameof(GetCount)} first.");
 
-        return TakeSomeAmmo(count);
+        return TakeSome(count);
     }
 
-    public virtual OneTypeAmmoInventory TakeSomeAmmo(string ammoId, int maxCount)
+    public virtual OneTypeAmmoInventory TakeSome(string ammoId, int maxCount)
     {
-        int currentCount = GetAmmoCount(ammoId);
+        int currentCount = GetCount(ammoId);
         int maxCanTake = Math.Min(currentCount, maxCount);
         Set(ammoId, currentCount - maxCanTake);
         return OneTypeAmmoInventory.Full(ammoId, maxCanTake);
