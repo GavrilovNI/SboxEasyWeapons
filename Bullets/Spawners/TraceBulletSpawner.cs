@@ -65,6 +65,7 @@ public partial class TraceBulletSpawner : BulletSpawner
         ray.Forward = forward;
 
         IEnumerable<TraceResult> traceResults;
+        using(Prediction.Off())
             traceResults = DoTrace(ray);
 
         foreach(var traceResult in traceResults)
