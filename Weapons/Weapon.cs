@@ -27,6 +27,9 @@ public partial class Weapon : BaseCarriable
     [Net, Local]
     public Ray DefaultLocalAimRay { get; set; }
 
+    [Net, Predicted]
+    public bool UseOwnerAimRay { get; set; } = false;
+
 
     [Net, Predicted]
     public TimeSince TimeSinceDeploy { get; protected set; }
@@ -36,9 +39,16 @@ public partial class Weapon : BaseCarriable
 
     protected IEnumerable<WeaponModule> Modules => Components.GetAll<WeaponModule>(true);
 
-    public override Ray AimRay => Owner == null
-        ? new Ray(Transform.PointToWorld(DefaultLocalAimRay.Position * Scale), Transform.NormalToWorld(DefaultLocalAimRay.Forward).Normal)
-        : Owner.AimRay;
+    public override Ray AimRay
+    {
+        get
+        {
+            if(UseOwnerAimRay && Owner != null)
+                return Owner.AimRay;
+
+            return new Ray(Transform.PointToWorld(DefaultLocalAimRay.Position * Scale), Transform.NormalToWorld(DefaultLocalAimRay.Forward).Normal);
+        }
+    }
 
 
 
