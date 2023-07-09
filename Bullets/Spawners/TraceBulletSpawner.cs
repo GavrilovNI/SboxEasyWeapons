@@ -9,9 +9,6 @@ namespace EasyWeapons.Bullets.Spawners;
 public partial class TraceBulletSpawner : BulletSpawner
 {
     [Net, Local]
-    public Ray Ray { get; set; }
-
-    [Net, Local]
     public float Force { get; set; }
 
     [Net, Local]
@@ -61,9 +58,11 @@ public partial class TraceBulletSpawner : BulletSpawner
     {
         Game.SetRandomSeed(Time.Tick);
 
-        var forward = Ray.Forward;
+        var forward = ray.Forward;
         forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) / 4f * Spread;
         forward = forward.Normal;
+
+        ray.Forward = forward;
 
         IEnumerable<TraceResult> traceResults;
             traceResults = DoTrace(ray);
