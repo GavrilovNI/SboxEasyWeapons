@@ -89,13 +89,13 @@ public partial class SimpleAttackModule : AttackModule
 
     protected override void Shoot()
     {
-        BulletSpawner.Spawn(AimRay, ModifyDamageInfo);
+        BulletSpawner.Spawn(AimRay, GetDamageInfo());
         DoShootEffects();
     }
 
-    protected virtual DamageInfo ModifyDamageInfo(DamageInfo damageInfo)
+    protected virtual DamageInfo GetDamageInfo()
     {
-        return damageInfo.WithAttacker(Weapon.Owner, Weapon);
+        return new DamageInfo().WithAttacker(Weapon.Owner, Weapon);
     }
 
     protected virtual void DoShootEffects()

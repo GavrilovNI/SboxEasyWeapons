@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using EasyWeapons.Extensions;
+using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,7 @@ public partial class TraceBulletSpawner : BulletSpawner
         TraceTags = new List<string>() { "solid", "player", "npc", "glass" };
     }
 
-    public override void Spawn(Ray ray, Func<DamageInfo, DamageInfo>? damageInfoBuilder)
+    public override void Spawn(Ray ray, DamageInfo? damageInfo)
     {
         Game.SetRandomSeed(Time.Tick);
 
@@ -64,7 +65,8 @@ public partial class TraceBulletSpawner : BulletSpawner
         forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) / 4f * Spread;
         forward = forward.Normal;
 
-        var traceResults = DoTrace(ray);
+        IEnumerable<TraceResult> traceResults;
+            traceResults = DoTrace(ray);
 
         foreach(var traceResult in traceResults)
         {
@@ -75,13 +77,9 @@ public partial class TraceBulletSpawner : BulletSpawner
             if(!traceResult.Entity.IsValid())
                 continue;
 
-            using(Prediction.Off())
-            {
-                var damageInfo = DamageInfo.FromBullet(traceResult.EndPosition, forward * Force, Damage).UsingTraceResult(traceResult);
-                if(damageInfoBuilder != null)
-                    damageInfo = damageInfoBuilder.Invoke(damageInfo);
-                traceResult.Entity.TakeDamage(damageInfo);
-            }
+            var totalDamageInfo = damageInfo.GetValueOrDefault(new DamageInfo());
+            totalDamageInfo = totalDamageInfo.AsBullet(traceResult.EndPosition, traceResult.Direction * Force, Damage).UsingTraceResult(traceResult);
+            traceResult.Entity.TakeDamage(totalDamageInfo);
         }
     }
 
