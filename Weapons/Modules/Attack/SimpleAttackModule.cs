@@ -1,5 +1,7 @@
 ﻿using EasyWeapons.Bullets.Spawners;
 using EasyWeapons.Inventories;
+using EasyWeapons.Recoiles;
+using EasyWeapons.Recoiles.Modules;
 using EasyWeapons.Sounds;
 using EasyWeapons.Weapons.Modules.Attack.ShootingModes;
 using Sandbox;
@@ -31,6 +33,8 @@ public partial class SimpleAttackModule : AttackModule
     [Net]
     public string AttackParticleAttachment { get; set; } = "muzzle";
 
+    [Net, Local]
+    public Recoil? Recoil { get; set; }
 
     [Net, Predicted, Local]
     public ShootingMode ShootingMode { get; protected set; }
@@ -98,8 +102,26 @@ public partial class SimpleAttackModule : AttackModule
         return new DamageInfo().WithAttacker(Weapon.Owner, Weapon);
     }
 
+    protected virtual void ApplyRecoil()
+    {
+        if(Recoil is null)
+            return;
+
+        var owner = Entity.Owner;
+        if(owner is null)
+            return;
+
+        var recoilApplier = owner.Components.Get<IRecoilApplier>();
+        if(recoilApplier is null)
+            return;
+
+        Recoil.ApplyRecoil(recoilApplier);
+    }
+
     protected virtual void DoShootEffects()
     {
+        ApplyRecoil();
+
         if(Game.IsServer == false)
             return;
 
