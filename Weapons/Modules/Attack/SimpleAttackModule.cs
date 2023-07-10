@@ -86,7 +86,10 @@ public partial class SimpleAttackModule : AttackModule
 
     protected virtual bool ShouldAttack()
     {
-        bool timePassed = TimeSinceLastAttackTry >= MinTimeBetweenAttacks;
+        bool timePassed = TimeSinceLastAttackTry >= MinTimeBetweenAttacks &&
+                            TimeSinceLastAttack >= MinTimeBetweenAttacks &&
+                            TimeSinceLastFail >= MinTimeBetweenAttacks;
+
         if(timePassed == false)
             return false;
 
