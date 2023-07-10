@@ -36,6 +36,9 @@ public partial class SimpleAttackModule : AttackModule
     [Net, Local]
     public Recoil? Recoil { get; set; }
 
+    [Net, Local]
+    public float NoOwnerRecoilForce { get; set; } = 50000;
+
     [Net, Predicted, Local]
     public ShootingMode ShootingMode { get; protected set; }
 
@@ -109,7 +112,10 @@ public partial class SimpleAttackModule : AttackModule
 
         var owner = Entity.Owner;
         if(owner is null)
+        {
+            Weapon.PhysicsBody.ApplyForceAt(AimRay.Position, -AimRay.Forward.Normal * NoOwnerRecoilForce);
             return;
+        }
 
         var recoilApplier = owner.Components.Get<IRecoilApplier>();
         if(recoilApplier is null)
