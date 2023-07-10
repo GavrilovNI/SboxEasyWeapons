@@ -1,5 +1,7 @@
 ﻿
 
+using System;
+
 namespace EasyWeapons.Inventories;
 
 public static class AmmoInventoryExtensions
@@ -10,8 +12,8 @@ public static class AmmoInventoryExtensions
 
     public static bool Contains(this IAmmoInventory inventory, string ammoId) => inventory.GetCount(ammoId) > 0;
 
-    public static int GetMaxAmountCanAdd(this IAmmoInventory inventory) => inventory.GetLimit() - inventory.GetCount();
-    public static int GetMaxAmountCanAdd(this IAmmoInventory inventory, string ammoId) => inventory.GetLimit(ammoId) - inventory.GetCount(ammoId);
+    public static int GetMaxAmountCanAdd(this IAmmoInventory inventory) => Math.Max(0, inventory.GetLimit() - inventory.GetCount());
+    public static int GetMaxAmountCanAdd(this IAmmoInventory inventory, string ammoId) => Math.Max(0, inventory.GetLimit(ammoId) - inventory.GetCount(ammoId));
 
     public static bool CanAdd(this IAmmoInventory inventory, OneTypeAmmoInventory ammoSet) => inventory.CanAdd(ammoSet.AmmoId, ammoSet.AmmoCount);
     public static void Add(this IAmmoInventory inventory, OneTypeAmmoInventory ammoSet) => inventory.Add(ammoSet.AmmoId, ammoSet.AmmoCount);
