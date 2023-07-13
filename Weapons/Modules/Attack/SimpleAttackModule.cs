@@ -62,10 +62,12 @@ public partial class SimpleAttackModule : AttackModule
 
     public override SimulationResult Simulate(SimulationType simulationType)
     {
+        ShootingMode.OnSimulateBegin(simulationType, AttackAction);
+
         if(ShouldAttack())
             base.Simulate(simulationType);
 
-        return ShootingMode.IsShooting ? SimulationResult.Continuing : SimulationResult.Finished;
+        return ShootingMode.ShouldAttack() ? SimulationResult.Continuing : SimulationResult.Finished;
     }
 
     public override void Attack()
@@ -96,8 +98,7 @@ public partial class SimpleAttackModule : AttackModule
         if(timePassed == false)
             return false;
 
-        bool hasOwner = Weapon.Owner.IsValid();
-        return hasOwner ? ShootingMode.ShouldAttack(AttackAction) : ShootingMode.ShouldAttack();
+        return ShootingMode.ShouldAttack();
     }
 
     protected override void Shoot()

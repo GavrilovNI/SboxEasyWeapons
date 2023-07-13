@@ -2,21 +2,31 @@
 
 namespace EasyWeapons.Weapons.Modules.Attack.ShootingModes;
 
-public class SemiShootingMode : ShootingMode
+public partial class SemiShootingMode : ShootingMode
 {
+    [Net, Predicted, Local]
+    public bool AttackPressed { get; set; }
+
     public override bool ShouldAttack()
     {
-        return false;
+        return AttackPressed;
     }
 
-    public override bool ShouldAttack(string inputAction)
+    public override void OnSimulateBegin(SimulationType simulationType, string inputAction)
     {
-        return Input.Pressed(inputAction);
+        base.OnSimulateBegin(simulationType, inputAction);
+        AttackPressed = simulationType == SimulationType.Simulating && Input.Pressed(inputAction);
     }
 
     public override void OnShot()
     {
         base.OnShot();
-        IsShooting = false;
+        AttackPressed = false;
+    }
+
+    public override void OnFail()
+    {
+        base.OnFail();
+        AttackPressed = false;
     }
 }
