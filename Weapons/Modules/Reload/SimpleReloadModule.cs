@@ -75,7 +75,7 @@ public partial class SimpleReloadModule : ReloadModule
 
     public override SimulationResult Simulate(SimulationType simulationType)
     {
-        if(Input.Pressed(ReloadAction))
+        if(simulationType == SimulationType.Simulating && Input.Pressed(ReloadAction))
         {
             if(CanStartReload())
                 Reload();
