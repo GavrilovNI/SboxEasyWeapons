@@ -1,10 +1,11 @@
 ﻿using EasyWeapons.Bullets.Spawners;
+using EasyWeapons.Effects;
 using EasyWeapons.Inventories;
 using EasyWeapons.Recoiles;
 using EasyWeapons.Recoiles.Modules;
-using EasyWeapons.Sounds;
 using EasyWeapons.Weapons.Modules.Attack.ShootingModes;
 using Sandbox;
+using System.Collections.Generic;
 
 namespace EasyWeapons.Weapons.Modules.Attack;
 
@@ -18,23 +19,11 @@ public partial class SimpleAttackModule : AttackModule
     [Net, Local]
     public BulletSpawner BulletSpawner { get; protected set; }
 
-    [Net]
-    public PlayableDelayedSound? AttackSound { get; set; }
+    [Net, Local]
+    public IList<WeaponEffect> AttackEffects { get; set; } = null!;
 
-    [Net]
-    public PlayableDelayedSound? DryfireSound { get; set; }
-
-    [Net]
-    public string? AttackAnimation { get; set; } = "fire";
-
-    [Net]
-    public string? WorldAttackAnimation { get; set; } = "b_attack";
-
-    [Net]
-    public string AttackParticlePath { get; set; } = "particles/pistol_muzzleflash.vpcf";
-
-    [Net]
-    public string AttackParticleAttachment { get; set; } = "muzzle";
+    [Net, Local]
+    public IList<WeaponEffect> DryfireEffects { get; set; } = null!;
 
     [Net, Local]
     public Recoil? Recoil { get; set; }
@@ -80,7 +69,7 @@ public partial class SimpleAttackModule : AttackModule
     {
         base.Fail();
         ShootingMode.OnFail();
-        DoFailEffects();
+        DryfireEffects.Play(Weapon);
     }
 
     protected override void OnDeactivate()
@@ -104,7 +93,8 @@ public partial class SimpleAttackModule : AttackModule
     protected override void Shoot()
     {
         BulletSpawner.Spawn(AimRay, GetDamageInfo());
-        DoShootEffects();
+        ApplyRecoil();
+        AttackEffects.Play(Weapon);
     }
 
     protected virtual DamageInfo GetDamageInfo()
@@ -129,30 +119,5 @@ public partial class SimpleAttackModule : AttackModule
             return;
 
         Recoil.ApplyRecoil(recoilApplier);
-    }
-
-    protected virtual void DoShootEffects()
-    {
-        ApplyRecoil();
-
-        if(WorldAttackAnimation is not null)
-            Weapon.SetWorldModelAnimParameter(WorldAttackAnimation, true);
-
-        if(Game.IsServer == false)
-            return;
-
-        _ = AttackSound?.PlayOnEntity(Weapon);
-        Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
-
-        if(AttackAnimation is not null)
-            Weapon.SetViewModelAnimParameter(AttackAnimation, true);
-    }
-
-    protected virtual void DoFailEffects()
-    {
-        if(Game.IsServer == false)
-            return;
-
-        _ = DryfireSound?.PlayOnEntity(Weapon);
     }
 }

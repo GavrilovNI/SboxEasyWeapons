@@ -1,4 +1,4 @@
-﻿using EasyWeapons.Sounds;
+﻿using EasyWeapons.Effects;
 using EasyWeapons.Weapons.Modules;
 using Sandbox;
 using System.Collections.Generic;
@@ -8,21 +8,14 @@ namespace EasyWeapons.Weapons;
 
 public partial class Weapon : BaseCarriable
 {
-
-    [Net]
-    public PlayableDelayedSound? DeploySound { get; set; }
+    [Net, Local]
+    public IList<WeaponEffect> DeployEffects { get; set; } = null!;
 
     [Net, Local]
     public CitizenAnimationHelper.HoldTypes HoldType { get; set; } = CitizenAnimationHelper.HoldTypes.Pistol;
 
     [Net, Local]
     public CitizenAnimationHelper.Hand Handedness { get; set; } = CitizenAnimationHelper.Hand.Both;
-
-    [Net, Local]
-    public string? DeployAnimation { get; set; } = "b_deploy";
-
-    [Net, Local]
-    public string? WorldDeployAnimation { get; set; } = "b_deploy";
 
     [Net, Local]
     public Model? ViewModel { get; set; }
@@ -155,7 +148,7 @@ public partial class Weapon : BaseCarriable
     {
         base.ActiveStart(owner);
         TimeSinceDeploy = 0;
-        DoDeployEffects();
+        DeployEffects.Play(this);
     }
 
     public override void ActiveEnd(Entity ent, bool dropped)
@@ -163,40 +156,6 @@ public partial class Weapon : BaseCarriable
         base.ActiveEnd(ent, dropped);
         if(dropped == false)
             DisableModules();
-    }
-
-    [ClientRpc]
-    public void CreateParticle(string name, string attachment, bool follow = true)
-    {
-        Game.AssertClient();
-        Particles.Create(name, EffectEntity, attachment, follow);
-    }
-
-    [ClientRpc]
-    public void SetViewModelAnimParameter(string name, bool value)
-    {
-        Game.AssertClient();
-        ViewModelEntity?.SetAnimParameter(name, value);
-        ViewModelArms?.SetAnimParameter(name, value);
-    }
-
-    public void SetWorldModelAnimParameter(string name, bool value)
-    {
-        (Owner as AnimatedEntity)?.SetAnimParameter(name, value);
-    }
-
-    public virtual void DoDeployEffects()
-    {
-        if(WorldDeployAnimation is not null)
-            SetWorldModelAnimParameter(WorldDeployAnimation, true);
-
-        if(Game.IsServer == false)
-            return;
-
-        if(DeployAnimation is not null)
-            SetViewModelAnimParameter(DeployAnimation, true);
-
-        _ = DeploySound?.PlayOnEntity(this);
     }
 
     public override void SimulateAnimator(CitizenAnimationHelper anim)

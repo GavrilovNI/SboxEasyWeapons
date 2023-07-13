@@ -1,7 +1,9 @@
-﻿using EasyWeapons.Extensions;
+﻿using EasyWeapons.Effects;
+using EasyWeapons.Extensions;
 using EasyWeapons.Inventories;
-using EasyWeapons.Sounds;
 using Sandbox;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace EasyWeapons.Weapons.Modules.Reload;
@@ -29,21 +31,16 @@ public partial class SimpleReloadModule : ReloadModule
     public string ReloadAction { get; set; }
 
     [Net]
-    public PlayableDelayedSound? ReloadSound { get; set; }
+    public IList<WeaponEffect> ReloadEffects { get; set; } = null!;
 
     [Net]
-    public PlayableDelayedSound? ReloadFailSound { get; set; }
-
-    [Net]
-    public string? ReloadAnimation { get; set; } = "reload";
-
-    [Net]
-    public string? WorldReloadAnimation { get; set; } = "b_reload";
+    public IList<WeaponEffect> ReloadFailEffects { get; set; } = null!;
 
     [Net]
     private OneTypeAmmoInventory? ReloadingSet { get; set; }
 
-    private CancellationTokenSource? SoundCancellationTokenSource { get; set; }
+    private CancellationTokenSource? ReloadEffectCancellationTokenSource { get; set; }
+
 
     public SimpleReloadModule()
     {
@@ -80,7 +77,7 @@ public partial class SimpleReloadModule : ReloadModule
             if(CanStartReload())
                 Reload();
             else if(WeaponClip.GetMaxAmountCanAdd(AmmoId) > 0)
-                DoFailEffects();
+                ReloadFailEffects.Play(Weapon);
         }
 
         if(IsReloading)
@@ -113,15 +110,17 @@ public partial class SimpleReloadModule : ReloadModule
         base.Reload();
         var maxAmmoNeeded = WeaponClip.GetMaxAmountCanAdd(AmmoId);
         ReloadingSet = AmmoInventory!.TakeSome(AmmoId, maxAmmoNeeded);
-        DoReloadEffects();
+
+        ReloadEffectCancellationTokenSource = new CancellationTokenSource();
+        ReloadEffects.Play(Weapon, ReloadEffectCancellationTokenSource.Token);
     }
 
     public override void Cancel()
     {
         base.Cancel();
 
-        SoundCancellationTokenSource?.Cancel();
-        SoundCancellationTokenSource = null;
+        ReloadEffectCancellationTokenSource?.Cancel();
+        ReloadEffectCancellationTokenSource = null;
 
         ReturnReloadingAmmo();
         if(ReloadingSet!.AmmoCount > 0)
@@ -148,27 +147,7 @@ public partial class SimpleReloadModule : ReloadModule
         if(ReloadingSet.AmmoCount > 0)
             DropReloadingAmmo();
 
-        SoundCancellationTokenSource = null;
-    }
-
-    protected virtual void DoReloadEffects()
-    {
-        if(WorldReloadAnimation is not null)
-            Weapon.SetWorldModelAnimParameter(WorldReloadAnimation, true);
-
-        if(Game.IsServer)
-        {
-            SoundCancellationTokenSource = new CancellationTokenSource();
-            ReloadSound?.PlayOnEntity(Weapon, SoundCancellationTokenSource.Token);
-            if(ReloadAnimation is not null)
-                Weapon.SetViewModelAnimParameter(ReloadAnimation, true);
-        }
-    }
-
-    protected virtual void DoFailEffects()
-    {
-        if(Game.IsClient)
-            ReloadFailSound?.PlayOnEntity(Weapon);
+        ReloadEffectCancellationTokenSource = null;
     }
 
     protected override bool IsValidToContinueReload()
