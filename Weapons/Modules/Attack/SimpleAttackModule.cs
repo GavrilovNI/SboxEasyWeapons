@@ -25,7 +25,10 @@ public partial class SimpleAttackModule : AttackModule
     public PlayableDelayedSound? DryfireSound { get; set; }
 
     [Net]
-    public string AttackAnimation { get; set; } = "fire";
+    public string? AttackAnimation { get; set; } = "fire";
+
+    [Net]
+    public string? WorldAttackAnimation { get; set; } = "b_attack";
 
     [Net]
     public string AttackParticlePath { get; set; } = "particles/pistol_muzzleflash.vpcf";
@@ -131,12 +134,17 @@ public partial class SimpleAttackModule : AttackModule
     {
         ApplyRecoil();
 
+        if(WorldAttackAnimation is not null)
+            Weapon.SetWorldModelAnimParameter(WorldAttackAnimation, true);
+
         if(Game.IsServer == false)
             return;
 
         _ = AttackSound?.PlayOnEntity(Weapon);
         Weapon.CreateParticle(AttackParticlePath, AttackParticleAttachment);
-        Weapon.SetViewModelAnimParameter(AttackAnimation, true);
+
+        if(AttackAnimation is not null)
+            Weapon.SetViewModelAnimParameter(AttackAnimation, true);
     }
 
     protected virtual void DoFailEffects()

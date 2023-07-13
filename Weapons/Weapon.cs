@@ -13,7 +13,16 @@ public partial class Weapon : BaseCarriable
     public PlayableDelayedSound? DeploySound { get; set; }
 
     [Net, Local]
-    public string? DeployAnimationParameter { get; set; } = "b_deploy";
+    public CitizenAnimationHelper.HoldTypes HoldType { get; set; } = CitizenAnimationHelper.HoldTypes.Pistol;
+
+    [Net, Local]
+    public CitizenAnimationHelper.Hand Handedness { get; set; } = CitizenAnimationHelper.Hand.Both;
+
+    [Net, Local]
+    public string? DeployAnimation { get; set; } = "b_deploy";
+
+    [Net, Local]
+    public string? WorldDeployAnimation { get; set; } = "b_deploy";
 
     [Net, Local]
     public string? ViewMoidelArmsPath { get; set; } = "models/first_person/first_person_arms.vmdl";
@@ -185,14 +194,29 @@ public partial class Weapon : BaseCarriable
         ViewModelArms?.SetAnimParameter(name, value);
     }
 
+    public void SetWorldModelAnimParameter(string name, bool value)
+    {
+        (Owner as AnimatedEntity)?.SetAnimParameter(name, value);
+    }
+
     public virtual void DoDeployEffects()
     {
+        if(WorldDeployAnimation is not null)
+            SetWorldModelAnimParameter(WorldDeployAnimation, true);
+
         if(Game.IsServer == false)
             return;
 
-        if(DeployAnimationParameter is not null)
-            SetViewModelAnimParameter(DeployAnimationParameter, true);
+        if(DeployAnimation is not null)
+            SetViewModelAnimParameter(DeployAnimation, true);
 
         _ = DeploySound?.PlayOnEntity(this);
+    }
+
+    public override void SimulateAnimator(CitizenAnimationHelper anim)
+    {
+        anim.HoldType = HoldType;
+        anim.Handedness = Handedness;
+        anim.AimBodyWeight = 1.0f;
     }
 }

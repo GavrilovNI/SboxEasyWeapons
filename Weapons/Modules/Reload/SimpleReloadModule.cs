@@ -35,7 +35,10 @@ public partial class SimpleReloadModule : ReloadModule
     public PlayableDelayedSound? ReloadFailSound { get; set; }
 
     [Net]
-    public string ReloadAnimation { get; set; } = "reload";
+    public string? ReloadAnimation { get; set; } = "reload";
+
+    [Net]
+    public string? WorldReloadAnimation { get; set; } = "b_reload";
 
     [Net]
     private OneTypeAmmoInventory? ReloadingSet { get; set; }
@@ -149,11 +152,15 @@ public partial class SimpleReloadModule : ReloadModule
 
     protected virtual void DoReloadEffects()
     {
+        if(WorldReloadAnimation is not null)
+            Weapon.SetWorldModelAnimParameter(WorldReloadAnimation, true);
+
         if(Game.IsServer)
         {
             SoundCancellationTokenSource = new CancellationTokenSource();
             ReloadSound?.PlayOnEntity(Weapon, SoundCancellationTokenSource.Token);
-            Weapon.SetViewModelAnimParameter(ReloadAnimation, true);
+            if(ReloadAnimation is not null)
+                Weapon.SetViewModelAnimParameter(ReloadAnimation, true);
         }
     }
 
