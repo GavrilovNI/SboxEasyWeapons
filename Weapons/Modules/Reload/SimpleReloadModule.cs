@@ -132,7 +132,8 @@ public partial class SimpleReloadModule : ReloadModule
 
     protected virtual void ReturnReloadingAmmo()
     {
-        ReloadingSet = AmmoInventory!.AddAsMaxAsCan(ReloadingSet!);
+        if(AmmoInventory is not null)
+            ReloadingSet = AmmoInventory.AddAsMaxAsCan(ReloadingSet!);
     }
 
     protected virtual void DropReloadingAmmo()
