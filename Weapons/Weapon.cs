@@ -25,9 +25,6 @@ public partial class Weapon : BaseCarriable
     public string? WorldDeployAnimation { get; set; } = "b_deploy";
 
     [Net, Local]
-    public string? ViewMoidelArmsPath { get; set; } = "models/first_person/first_person_arms.vmdl";
-
-    [Net, Local]
     public Model? ViewModel { get; set; }
 
     [Net, Local]
@@ -39,12 +36,9 @@ public partial class Weapon : BaseCarriable
     [Net, Predicted]
     public bool UseOwnerAimRay { get; set; } = false;
 
-
     [Net, Predicted]
     public TimeSince TimeSinceDeploy { get; protected set; }
 
-
-    public AnimatedEntity? ViewModelArms { get; set; }
 
     protected IEnumerable<WeaponModule> Modules => Components.GetAll<WeaponModule>(true);
 
@@ -60,7 +54,6 @@ public partial class Weapon : BaseCarriable
     }
 
 
-
     public override void CreateViewModel()
     {
         Game.AssertClient();
@@ -74,13 +67,6 @@ public partial class Weapon : BaseCarriable
             ViewModelEntity.Model = ViewModel;
         else
             ViewModelEntity.SetModel(ViewModelPath);
-
-        if(ViewMoidelArmsPath is not null)
-        {
-            ViewModelArms = new AnimatedEntity(ViewMoidelArmsPath);
-            ViewModelArms.SetParent(ViewModelEntity, true);
-            ViewModelArms.EnableViewmodelRendering = true;
-        }
     }
 
     public override void Spawn()
