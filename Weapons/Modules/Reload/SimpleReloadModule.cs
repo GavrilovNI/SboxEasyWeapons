@@ -15,7 +15,7 @@ public partial class SimpleReloadModule : ReloadModule
     {
         get
         {
-            if(Weapon.Owner == null)
+            if(Weapon.Owner is null)
                 return null;
 
             return Weapon.Owner.GetOrCreateAmmoInventoryComponent()?.AmmoInventory;
@@ -98,7 +98,7 @@ public partial class SimpleReloadModule : ReloadModule
             return false;
 
         var ammoInventory = AmmoInventory;
-        if(ammoInventory == null)
+        if(ammoInventory is null)
             return false;
 
         var maxAmmoNeeded = WeaponClip.GetMaxAmountCanAdd(AmmoId);
