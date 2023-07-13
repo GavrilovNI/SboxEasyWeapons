@@ -53,6 +53,12 @@ public partial class ReloadModule : WeaponModule
 
     protected virtual void HandleReload()
     {
+        if(IsValidToContinueReload() == false)
+        {
+            Cancel();
+            return;
+        }
+
         if(TimeSinceReload >= ReloadTime)
         {
             IsReloading = false;
@@ -63,5 +69,10 @@ public partial class ReloadModule : WeaponModule
     protected virtual void OnFinishedReload()
     {
 
+    }
+
+    protected virtual bool IsValidToContinueReload()
+    {
+        return true;
     }
 }

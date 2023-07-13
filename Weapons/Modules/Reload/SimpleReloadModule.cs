@@ -170,4 +170,9 @@ public partial class SimpleReloadModule : ReloadModule
         if(Game.IsClient)
             ReloadFailSound?.PlayOnEntity(Weapon);
     }
+
+    protected override bool IsValidToContinueReload()
+    {
+        return AmmoInventory is not null;
+    }
 }
