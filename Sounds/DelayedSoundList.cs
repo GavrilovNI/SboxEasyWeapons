@@ -8,10 +8,10 @@ namespace EasyWeapons.Sounds;
 
 public partial class DelayedSoundList : PlayableDelayedSound
 {
-    [Net]
+    [Net, Local]
     public float TotalTime { get; private set; } = 0;
 
-    [Net]
+    [Net, Local]
     private IList<DelayedSound> Sounds { get; set; } = new List<DelayedSound>();
 
     public DelayedSoundList()

@@ -7,11 +7,11 @@ namespace EasyWeapons.Sounds;
 
 public partial class DelayedSound : PlayableDelayedSound
 {
-    [Net]
-    public string SoundName { get; private set; }
+    [Net, Local]
+    public string SoundName { get; set; }
 
-    [Net]
-    public float Delay { get; private set; }
+    [Net, Local]
+    public float Delay { get; set; }
 
     public DelayedSound()
     {
