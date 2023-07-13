@@ -37,7 +37,7 @@ public partial class ReloadModule : WeaponModule
         IsReloading = false;
     }
 
-    public override SimulationResult Simulate()
+    public override SimulationResult Simulate(SimulationType simulationType)
     {
         if(CanStartReload())
             Reload();

@@ -60,10 +60,10 @@ public partial class SimpleAttackModule : AttackModule
         ShootingMode = shootingMode;
     }
 
-    public override SimulationResult Simulate()
+    public override SimulationResult Simulate(SimulationType simulationType)
     {
         if(ShouldAttack())
-            base.Simulate();
+            base.Simulate(simulationType);
 
         return ShootingMode.IsShooting ? SimulationResult.Continuing : SimulationResult.Finished;
     }

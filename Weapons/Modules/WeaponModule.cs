@@ -6,5 +6,5 @@ public abstract class WeaponModule : EntityComponent<Weapon>
 {
     public Weapon Weapon => Entity;
 
-    public abstract SimulationResult Simulate();
+    public abstract SimulationResult Simulate(SimulationType simulationType);
 }

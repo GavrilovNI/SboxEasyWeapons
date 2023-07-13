@@ -73,7 +73,7 @@ public partial class SimpleReloadModule : ReloadModule
         base.OnDeactivate();
     }
 
-    public override SimulationResult Simulate()
+    public override SimulationResult Simulate(SimulationType simulationType)
     {
         if(Input.Pressed(ReloadAction))
         {

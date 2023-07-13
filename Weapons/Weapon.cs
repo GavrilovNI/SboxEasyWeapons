@@ -101,7 +101,7 @@ public partial class Weapon : BaseCarriable
     private void ServerTick()
     {
         if(Owner.IsValid() == false)
-            SimulateEnabledModule();
+            SimulateEnabledModule(SimulationType.Ticking);
     }
 
     public override void Simulate(IClient client)
@@ -110,11 +110,11 @@ public partial class Weapon : BaseCarriable
 
         if(TimeSinceDeploy <= DeployTime)
         {
-            SimulateEnabledModule();
+            SimulateEnabledModule(SimulationType.Simulating);
             return;
         }
 
-        SimulateModules();
+        SimulateModules(SimulationType.Simulating);
     }
 
     protected override void OnComponentAdded(EntityComponent component)
@@ -123,14 +123,14 @@ public partial class Weapon : BaseCarriable
             component.Enabled = false;
     }
 
-    protected virtual SimulationResult HandleModuleSimulation(WeaponModule module)
+    protected virtual SimulationResult HandleModuleSimulation(SimulationType simulationType, WeaponModule module)
     {
-        var simulationResult = module.Simulate();
+        var simulationResult = module.Simulate(simulationType);
         module.Enabled = simulationResult == SimulationResult.Continuing;
         return simulationResult;
     }
 
-    protected virtual SimulationResult SimulateEnabledModule()
+    protected virtual SimulationResult SimulateEnabledModule(SimulationType simulationType)
     {
         var enabledModules = Modules.Where(m => m.Enabled);
         bool hasEnabledModule = enabledModules.Any();
@@ -138,19 +138,19 @@ public partial class Weapon : BaseCarriable
         if(hasEnabledModule)
         {
             WeaponModule module = enabledModules.First();
-            return HandleModuleSimulation(module);
+            return HandleModuleSimulation(simulationType, module);
         }
         return SimulationResult.Finished;
     }
 
-    protected virtual SimulationResult SimulateModules()
+    protected virtual SimulationResult SimulateModules(SimulationType simulationType)
     {
-        var enabledModuleSimulatingResult = SimulateEnabledModule();
+        var enabledModuleSimulatingResult = SimulateEnabledModule(simulationType);
         if(enabledModuleSimulatingResult == SimulationResult.Finished)
         {
             foreach(var module in Modules)
             {
-                var simulationResult = HandleModuleSimulation(module);
+                var simulationResult = HandleModuleSimulation(simulationType, module);
                 if(simulationResult == SimulationResult.Continuing)
                     return simulationResult;
             }

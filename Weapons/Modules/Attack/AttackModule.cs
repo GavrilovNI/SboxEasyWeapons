@@ -36,7 +36,7 @@ public abstract partial class AttackModule : WeaponModule
     }
 
 
-    public override SimulationResult Simulate()
+    public override SimulationResult Simulate(SimulationType simulationType)
     {
         var result = SimulationResult.Finished;
         if(CanStartAttack())
