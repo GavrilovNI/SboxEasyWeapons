@@ -1,9 +1,10 @@
-﻿using Sandbox;
+﻿using EasyWeapons.Entities.Components;
+using Sandbox;
 using System;
 
 namespace EasyWeapons.Weapons.Modules.Reload;
 
-public partial class ReloadModule : WeaponModule
+public partial class ReloadModule : WeaponModule, ICancelableComponent
 {
     [Net]
     public bool IsReloading { get; protected set; }
@@ -12,6 +13,9 @@ public partial class ReloadModule : WeaponModule
     public float ReloadTime { get; set; } = 1f;
 
     [Net]
+    public bool ShouldCancelOtherModules { get; set; } = false;
+
+    [Net, Predicted]
     public TimeSince TimeSinceReload { get; protected set; }
 
 
@@ -27,6 +31,9 @@ public partial class ReloadModule : WeaponModule
 
         TimeSinceReload = 0;
         IsReloading = true;
+
+        if(ShouldCancelOtherModules)
+            CancelOtherModules();
     }
 
     public virtual void Cancel()
@@ -49,6 +56,17 @@ public partial class ReloadModule : WeaponModule
         }
 
         return SimulationResult.Finished;
+    }
+
+    protected void CancelOtherModules()
+    {
+        foreach(var cancelable in Weapon.Components.GetAll<ICancelableComponent>(true))
+        {
+            if(object.ReferenceEquals(cancelable, this))
+                continue;
+
+            cancelable.Cancel();
+        }
     }
 
     protected virtual void HandleReload()
