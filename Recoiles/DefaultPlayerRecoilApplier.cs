@@ -1,10 +1,10 @@
-﻿using EasyWeapons.Entities.Components;
+﻿using EasyWeapons.Events;
 using Sandbox;
 using System;
 
 namespace EasyWeapons.Recoiles;
 
-public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player>, IRecoilApplier, ISimulatedComponent
+public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player>, IRecoilApplier
 {
     [Net, Predicted, Local]
     public Angles AnglesToApply { get; set; } = Angles.Zero;
@@ -17,6 +17,7 @@ public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player
 
     [Net, Local]
     public float CompensateSpeed { get; set; } = 35f;
+
 
     public void ApplyRecoil(Angles angles)
     {
@@ -51,7 +52,22 @@ public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player
         Entity.ViewAngles += compensatingAngles;
     }
 
-    public virtual void Simulate(IClient client)
+    protected override void OnActivate()
+    {
+        base.OnActivate();
+        Event.Register(this);
+    }
+
+    protected override void OnDeactivate()
+    {
+        Event.Unregister(this);
+        base.OnDeactivate();
+    }
+
+
+    [CustomGameEvent.PreSimulate]
+
+    protected virtual void OnPreSimulate(IClient client)
     {
         DoRecoil();
         CompensateRecoil();
