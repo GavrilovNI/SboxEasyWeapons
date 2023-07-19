@@ -6,6 +6,17 @@ namespace EasyWeapons.Extensions;
 
 public static class EntityExtensions
 {
+    public static IAmmoInventory? FindAmmoInventory(this IEntity entity, bool includeDisabledComponents = false)
+    {
+        if(entity is IAmmoInventoryOwner owner)
+            return owner.AmmoInventory;
+
+        if(entity is IAmmoInventory ammoInventory)
+            return ammoInventory;
+
+        return entity.Components.Get<IAmmoInventoryComponent>(includeDisabledComponents)?.AmmoInventory;
+    }
+
     public static IAmmoInventoryOwner? GetOrCreateAmmoInventoryComponent(this IEntity entity, bool includeDisabled = false)
     {
         var components = entity.Components;

@@ -20,7 +20,7 @@ public partial class SimpleReloadModule : ReloadModule
             if(Weapon.Owner is null)
                 return null;
 
-            return Weapon.Owner.GetOrCreateAmmoInventoryComponent()?.AmmoInventory;
+            return Weapon.Owner.FindAmmoInventory();
         }
     }
 
