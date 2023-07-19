@@ -1,4 +1,5 @@
 ﻿using EasyWeapons.Effects;
+using EasyWeapons.ViewModels;
 using EasyWeapons.Weapons.Modules;
 using Sandbox;
 using System.Collections.Generic;
@@ -51,10 +52,11 @@ public partial class Weapon : BaseCarriable
     {
         Game.AssertClient();
 
-        ViewModelEntity = new BaseViewModel();
-        ViewModelEntity.Position = Position;
-        ViewModelEntity.Owner = Owner;
-        ViewModelEntity.EnableViewmodelRendering = true;
+        ViewModelEntity = new WeaponViewModel()
+        {
+            Owner = Owner,
+            EnableViewmodelRendering = true
+        };
 
         if(ViewModel is not null)
             ViewModelEntity.Model = ViewModel;
