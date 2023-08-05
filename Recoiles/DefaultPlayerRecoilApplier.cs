@@ -69,6 +69,9 @@ public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player
 
     protected virtual void OnPreSimulate(IClient client)
     {
+        if(object.ReferenceEquals(Entity.Client, client) == false)
+            return;
+
         DoRecoil();
         CompensateRecoil();
     }
