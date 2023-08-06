@@ -70,10 +70,12 @@ public abstract partial class AttackModule : WeaponModule
 
         Enabled = true;
 
-        WeaponClip.TakeExact(1);
+        var ammos = WeaponClip.TakeExact(1);
+        var ammoId = ammos[0].AmmoId;
+
         using(Sandbox.Entity.LagCompensation())
         {
-            Shoot();
+            Shoot(ammoId);
         }
         TimeSinceLastAttack = 0;
     }
@@ -83,5 +85,5 @@ public abstract partial class AttackModule : WeaponModule
         TimeSinceLastFail = 0;
     }
 
-    protected abstract void Shoot();
+    protected abstract void Shoot(string ammoId);
 }

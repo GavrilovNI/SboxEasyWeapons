@@ -1,20 +1,16 @@
 ﻿using EasyWeapons.Entities.Components;
-using EasyWeapons.Extensions;
 using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EasyWeapons.Bullets;
+namespace EasyWeapons.Entities.Bullets;
 
 [Spawnable]
-public partial class TracingEntityBullet : ModelEntity, IBullet
+public partial class TracingEntityBullet : ModelEntity
 {
     [Net, Local]
     public Vector3 ExternalForce { get; set; } = Vector3.Down * 386f;
-
-    [Net, Local]
-    public float Speed { get; set; } = 5000f;
 
     [Net, Local]
     public float HitForce { get; set; } = 10f;
@@ -49,12 +45,9 @@ public partial class TracingEntityBullet : ModelEntity, IBullet
     {
         base.Spawn();
 
-        SetModel("models/dev/sphere.vmdl_c");
-        Scale = 0.05f;
-
         PhysicsEnabled = false;
         UsePhysicsCollision = false;
-        Tags.Add("bullet", "solid");
+        Tags.Add("bullet");
     }
 
     public void Initialize(Ray ray, DamageInfo? damageInfo)
@@ -63,8 +56,6 @@ public partial class TracingEntityBullet : ModelEntity, IBullet
         var initialDirection = ray.Forward;
         Rotation = initialDirection.EulerAngles.ToRotation();
         DamageInfo = damageInfo.GetValueOrDefault(new DamageInfo());
-
-        Velocity = initialDirection * Speed;
     }
 
 
@@ -124,7 +115,6 @@ public partial class TracingEntityBullet : ModelEntity, IBullet
 
     protected virtual void OnHit(TraceResult traceResult)
     {
-        Log.Info(traceResult.Entity);
         traceResult.Surface.DoBulletImpact(traceResult);
 
         if(!Game.IsServer)
@@ -132,7 +122,7 @@ public partial class TracingEntityBullet : ModelEntity, IBullet
         if(!traceResult.Entity.IsValid())
             return;
 
-        var totalDamageInfo = DamageInfo.AsBullet(traceResult.EndPosition, traceResult.Direction * HitForce, Damage).UsingTraceResult(traceResult);
+        var totalDamageInfo = DamageInfo.FromBullet(traceResult.EndPosition, traceResult.Direction * HitForce, Damage).UsingTraceResult(traceResult);
         traceResult.Entity.TakeDamage(totalDamageInfo);
 
         Delete();

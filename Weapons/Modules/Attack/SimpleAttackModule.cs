@@ -1,4 +1,6 @@
-﻿using EasyWeapons.Bullets.Spawners;
+﻿using EasyWeapons.Bullets;
+using EasyWeapons.Bullets.Datas;
+using EasyWeapons.Bullets.Spawners;
 using EasyWeapons.Effects;
 using EasyWeapons.Inventories;
 using EasyWeapons.Recoiles;
@@ -90,16 +92,11 @@ public partial class SimpleAttackModule : AttackModule
         return ShootingMode.ShouldAttack();
     }
 
-    protected override void Shoot()
+    protected override void Shoot(string ammoId)
     {
-        BulletSpawner.Spawn(AimRay, GetDamageInfo());
+        BulletSpawner.Spawn(AimRay, BulletsRegister.Instanse, ammoId);
         ApplyRecoil();
         AttackEffects.Play(Weapon);
-    }
-
-    protected virtual DamageInfo GetDamageInfo()
-    {
-        return new DamageInfo().WithAttacker(Weapon.Owner, Weapon);
     }
 
     protected virtual void ApplyRecoil()

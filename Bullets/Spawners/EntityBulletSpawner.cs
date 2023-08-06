@@ -1,41 +1,43 @@
-﻿using Sandbox;
+﻿using EasyWeapons.Bullets.Datas;
+using Sandbox;
 
 namespace EasyWeapons.Bullets.Spawners;
 
-public partial class EntityBulletSpawner : BulletSpawner
+public class EntityBulletSpawner : BulletSpawner
 {
-    [Net, Local]
-    public string BulletEntityName { get; set; } = null!;
-
-    public override void Spawn(Ray ray, DamageInfo? damageInfo)
+    public override void Spawn(Ray ray, IBulletDataSet bulletDataSet, string ammoId)
     {
         if(Game.IsServer == false)
             return;
 
-        var entityType = TypeLibrary.GetType<Entity>(BulletEntityName)?.TargetType;
-
-        if(entityType == null)
+        EntityBulletData? bulletData = bulletDataSet.Get<EntityBulletData>(ammoId);
+        if(bulletData == null)
         {
-            Log.Error($"Bullet entity '{BulletEntityName}' not found");
+            Log.Error($"{nameof(EntityBulletData)} wasn't found for {nameof(ammoId)} {ammoId}");
+            return;
+        }
+
+        var entityType = bulletData.GetEntityType();
+        if(entityType is null)
+        {
+            Log.Error($"Bullet entity not found");
             return;
         }
 
         if(!TypeLibrary.HasAttribute<SpawnableAttribute>(entityType))
         {
-            Log.Error($"Bullet entity '{BulletEntityName}' is not spawnable");
+            Log.Error($"Bullet entity is not spawnable");
             return;
         }
 
         var entityBullet = TypeLibrary.Create<Entity>(entityType);
 
-        if(entityBullet is not IBullet bullet)
+        if(entityBullet is null)
         {
-            Log.Error($"Bullet entity '{BulletEntityName}' doesn't implement {nameof(IBullet)}");
-            entityBullet.Delete();
+            Log.Error($"Couldn't create bullet entity");
             return;
         }
 
-        using(Prediction.Off())
-            bullet.Initialize(ray, damageInfo);
+        bulletData.InitializeEntity(entityBullet, ray);
     }
 }
