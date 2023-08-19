@@ -1,10 +1,11 @@
+﻿using EasyWeapons.Entities;
 using EasyWeapons.Entities.Components;
 using Sandbox;
 using System;
 
 namespace EasyWeapons.Recoiles;
 
-public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player>, IRecoilApplier, ISimulatedComponent
+public partial class DefaultPlayerRecoilApplier : EntityComponent, IRecoilApplier, ISimulatedComponent
 {
     [Net, Predicted, Local]
     public Angles AnglesToApply { get; set; } = Angles.Zero;
@@ -39,17 +40,23 @@ public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player
 
     protected virtual void DoRecoil()
     {
+        if(Entity is not IControllableEntity controllable)
+            return;
+
         var recoilAngles = GetSmoothAngles(AnglesToApply, RecoilSpeed);
         AnglesToApply -= recoilAngles;
-        Entity.ViewAngles += recoilAngles;
+        controllable.ViewAngles += recoilAngles;
         AppliedAngles += recoilAngles;
     }
 
     protected virtual void CompensateRecoil()
     {
+        if(Entity is not IControllableEntity controllable)
+            return;
+
         var compensatingAngles = GetSmoothAngles(AppliedAngles * -1, CompensateSpeed);
         AppliedAngles += compensatingAngles;
-        Entity.ViewAngles += compensatingAngles;
+        controllable.ViewAngles += compensatingAngles;
     }
 
     protected override void OnActivate()
