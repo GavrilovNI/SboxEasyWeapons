@@ -1,10 +1,10 @@
-﻿using EasyWeapons.Events;
+using EasyWeapons.Entities.Components;
 using Sandbox;
 using System;
 
 namespace EasyWeapons.Recoiles;
 
-public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player>, IRecoilApplier
+public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player>, IRecoilApplier, ISimulatedComponent
 {
     [Net, Predicted, Local]
     public Angles AnglesToApply { get; set; } = Angles.Zero;
@@ -64,14 +64,8 @@ public partial class DefaultPlayerRecoilApplier : EntityComponent<Sandbox.Player
         base.OnDeactivate();
     }
 
-
-    [CustomGameEvent.PreSimulate]
-
-    protected virtual void OnPreSimulate(IClient client)
+    public virtual void Simulate(IClient client)
     {
-        if(object.ReferenceEquals(Entity.Client, client) == false)
-            return;
-
         DoRecoil();
         CompensateRecoil();
     }
