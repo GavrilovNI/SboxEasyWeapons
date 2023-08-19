@@ -77,9 +77,8 @@ public partial class Weapon : BaseCarriable
         Event.Unregister(this);
     }
 
-
     [GameEvent.Tick.Server]
-    private void ServerTick()
+    protected virtual void ServerTick()
     {
         if(Owner.IsValid() == false)
             SimulateEnabledModule(SimulationType.Ticking);
