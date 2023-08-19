@@ -13,7 +13,13 @@ public partial class WeaponViewModel : BaseViewModel
     [Net, Predicted, Local]
     public float FieldOfView { get; set; } = 60;
 
-    public override void PlaceViewmodel()
+    public sealed override void PlaceViewmodel()
+    {
+
+    }
+
+    [GameEvent.Client.Frame]
+    public virtual void PlaceViewmodelOnFrame()
     {
         if(Game.IsRunningInVR)
             return;
