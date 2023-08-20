@@ -2,6 +2,6 @@
 
 namespace EasyWeapons.Bullets.Datas;
 
-public class BulletData : BaseNetworkable
+public abstract class BulletData : GameResource
 {
 }

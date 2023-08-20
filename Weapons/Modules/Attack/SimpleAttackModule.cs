@@ -94,7 +94,7 @@ public partial class SimpleAttackModule : AttackModule
 
     protected override void Shoot(string ammoId)
     {
-        BulletSpawner.Spawn(AimRay, BulletsRegister.Instanse, ammoId);
+        BulletSpawner.Spawn(AimRay, ammoId);
         ApplyRecoil();
         AttackEffects.Play(Weapon);
     }

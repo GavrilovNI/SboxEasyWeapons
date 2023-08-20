@@ -1,17 +1,15 @@
-﻿using Sandbox;
+﻿using EasyWeapons.Utils;
+using Sandbox;
 using System;
+using System.Threading.Tasks;
 
 namespace EasyWeapons.Bullets.Datas;
 
-public partial class EntityBulletData : BulletData
+[GameResource("Entity Bullet Data", "bentity", "", Category = "bullets", Icon = "bullet")]
+public class EntityBulletData : BulletData
 {
-    [Net, Predicted, Local]
-    public string ModelCloudIdentity { get; set; } = null!;
-
-    [Net, Predicted, Local]
-    public string BulletEntityName { get; set; } = null!;
-
-    [Net, Predicted, Local]
+    public string BulletEntityName { get; set; } = "TracingBulletEntity";
+    public string ModelName { get; set; } = null!;
     public float StartVelocity { get; set; } = 5000;
 
 
@@ -23,23 +21,22 @@ public partial class EntityBulletData : BulletData
             Log.Error($"Bullet entity '{BulletEntityName}' not found");
             return null;
         }
+
         return entityType;
     }
 
-    public void InitializeEntity(Entity entity, Ray ray)
+    public async Task Initialize(Entity entity, Ray ray)
     {
         if(entity is ModelEntity modelEntity)
-        {
-            Log.Info(ModelCloudIdentity);
-            modelEntity.Model = Cloud.Model(ModelCloudIdentity);
-        }
+            modelEntity.Model = await CloudUtils.LoadModel(ModelName);
 
-        using(Prediction.Off())
-        {
-            entity.Position = ray.Position;
-            var initialDirection = ray.Forward;
-            entity.Rotation = initialDirection.EulerAngles.ToRotation();
-            entity.Velocity = ray.Forward * StartVelocity;
-        }
+        if(entity.IsValid() == false)
+            return;
+
+        entity.Position = ray.Position;
+        var initialDirection = ray.Forward;
+        entity.Rotation = initialDirection.EulerAngles.ToRotation();
+        entity.Velocity = ray.Forward * StartVelocity;
+        Log.Info("test3");
     }
 }

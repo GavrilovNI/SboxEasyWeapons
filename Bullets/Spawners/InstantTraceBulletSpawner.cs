@@ -1,11 +1,10 @@
 ﻿using EasyWeapons.Bullets.Datas;
 using Sandbox;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace EasyWeapons.Bullets.Spawners;
 
-public partial class InstantTraceBulletSpawner : BulletSpawner
+public partial class InstantTraceBulletSpawner : BulletSpawner<InstantTraceBulletData>
 {
     [Net, Predicted, Local]
     public float Spread { get; set; }
@@ -25,7 +24,6 @@ public partial class InstantTraceBulletSpawner : BulletSpawner
     [Net, Predicted, Local]
     public string WaterTag { get; set; } = "water";
 
-
     public InstantTraceBulletSpawner()
     {
         Game.AssertClient();
@@ -41,26 +39,23 @@ public partial class InstantTraceBulletSpawner : BulletSpawner
         TraceTags = new List<string>() { "solid", "player", "npc", "glass" };
     }
 
-    public override void Spawn(Ray ray, IBulletDataSet bulletDataSet, string ammoId)
+    public override void Spawn(Ray ray, InstantTraceBulletData data)
     {
-        InstantTraceBulletData? bulletData = bulletDataSet.Get<InstantTraceBulletData>(ammoId);
-        if(bulletData == null)
-        {
-            Log.Error($"{nameof(InstantTraceBulletData)} wasn't found for {nameof(ammoId)} {ammoId}");
-            return;
-        }
-
         ray = ApplySpread(ray);
 
-        IEnumerable<TraceResult> traceResults;
-        using(Prediction.Off())
-            traceResults = Trace(ray);
+        var bullet = new InstantTraceBullet()
+        {
+            Ray = ray,
+            Distance = Distance,
+            TraceRadius = TraceRadius,
+            IgnoreEntity = IgnoreEntity,
+            TraceTags = TraceTags,
+            WaterTag = WaterTag,
+            Data = data,
+        };
 
-        foreach(var traceResult in traceResults)
-            bulletData.OnHit(traceResult);
-
+        bullet.Run();
     }
-
 
     protected virtual Ray ApplySpread(Ray ray)
     {
@@ -71,25 +66,5 @@ public partial class InstantTraceBulletSpawner : BulletSpawner
         forward = forward.Normal;
 
         return new Ray(ray.Position, forward);
-    }
-
-    protected virtual IEnumerable<TraceResult> Trace(Ray ray)
-    {
-        var trace = Sandbox.Trace.Ray(ray, Distance)
-            .Size(Vector3.One * TraceRadius)
-            .UseHitboxes()
-            .WithAnyTags(TraceTags.ToArray());
-
-        if(IgnoreEntity != null && IgnoreEntity.IsValid())
-            trace = trace.Ignore(IgnoreEntity);
-
-        bool isStartingUnderWater = Sandbox.Trace.TestPoint(ray.Position, WaterTag);
-        if(!isStartingUnderWater)
-            trace = trace.WithAnyTags(WaterTag);
-
-        var traceResult = trace.Run();
-
-        if(traceResult.Hit)
-            yield return traceResult;
     }
 }

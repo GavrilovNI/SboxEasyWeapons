@@ -47,6 +47,10 @@ public partial class Weapon : BaseCarriable
         }
     }
 
+    public Weapon()
+    {
+        Tags.Add("weapon");
+    }
 
     public override void CreateViewModel()
     {

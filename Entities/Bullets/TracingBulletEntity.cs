@@ -7,7 +7,7 @@ using System.Linq;
 namespace EasyWeapons.Entities.Bullets;
 
 [Spawnable]
-public partial class TracingEntityBullet : ModelEntity
+public partial class TracingBulletEntity : ModelEntity
 {
     [Net, Local]
     public Vector3 ExternalForce { get; set; } = Vector3.Down * 386f;
@@ -31,7 +31,7 @@ public partial class TracingEntityBullet : ModelEntity
 
     public DamageInfo DamageInfo { get; set; }
 
-    public TracingEntityBullet()
+    public TracingBulletEntity()
     {
         EnableTouch = true;
 

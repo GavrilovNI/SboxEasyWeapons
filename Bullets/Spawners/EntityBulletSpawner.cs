@@ -3,21 +3,14 @@ using Sandbox;
 
 namespace EasyWeapons.Bullets.Spawners;
 
-public class EntityBulletSpawner : BulletSpawner
+public class EntityBulletSpawner : BulletSpawner<EntityBulletData>
 {
-    public override void Spawn(Ray ray, IBulletDataSet bulletDataSet, string ammoId)
+    public override void Spawn(Ray ray, EntityBulletData data)
     {
         if(Game.IsServer == false)
             return;
 
-        EntityBulletData? bulletData = bulletDataSet.Get<EntityBulletData>(ammoId);
-        if(bulletData == null)
-        {
-            Log.Error($"{nameof(EntityBulletData)} wasn't found for {nameof(ammoId)} {ammoId}");
-            return;
-        }
-
-        var entityType = bulletData.GetEntityType();
+        var entityType = data.GetEntityType();
         if(entityType is null)
         {
             Log.Error($"Bullet entity not found");
@@ -31,13 +24,13 @@ public class EntityBulletSpawner : BulletSpawner
         }
 
         var entityBullet = TypeLibrary.Create<Entity>(entityType);
-
         if(entityBullet is null)
         {
             Log.Error($"Couldn't create bullet entity");
             return;
         }
-
-        bulletData.InitializeEntity(entityBullet, ray);
+        Log.Info("test1");
+        data.Initialize(entityBullet, ray);
+        Log.Info("test2");
     }
 }
